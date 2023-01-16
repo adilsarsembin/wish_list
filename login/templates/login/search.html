@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  <title>
+    Films
+  </title>
+{% endblock  %}
+
+{% block content %}
+  <a href={% url 'home' %}>Home</a>
+  <h2> That's what I could find for "{{ name }}": </h2>
+  <ul>
+    {% for result in results %}
+    <li>
+      <div>
+        <form method="POST" action="">
+          {% csrf_token %}
+          <p>Title: {{ result.title }}</p>
+          <input type="hidden" name="title" value="{{ result.title }}" />
+          <p>Release date: {{ result.release_date }}</p>
+          <input type="hidden" name="date" value="{{ result.release_date }}" />
+          <p>TMDB Rating: {{ result.vote_average }}</p>
+          <input type="hidden" name="rating" value="{{ result.vote_average }}" />
+          <button type="submit">Add to wish list</button>
+        </form>
+      </div>
+    </li> 
+    {% endfor %} 
+  </ul>
+{% endblock  %}

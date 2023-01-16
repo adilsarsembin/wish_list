@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  <title>
+    Registration page
+  </title>
+{% endblock  %}
+
+{% block content %}
+  <h3>Registration</h3>
+  <form method='POST' action=''>
+    {% csrf_token %}
+    <div>
+      {{form.first_name.label}}: 
+      {{form.first_name}}
+    </div>
+
+    <div>
+      {{form.last_name.label}}: 
+      {{form.last_name}}
+    </div>
+
+    <div>
+      {{form.username.label}}: 
+      {{form.username}}
+    </div>
+
+    <div>
+      {{form.password1.label}}: 
+      {{form.password1}}
+    </div>
+
+    <div>
+      {{form.password2.label}}: 
+      {{form.password2}}
+    </div>
+    
+    <input type='submit' value="Sign up">
+    <p>Already have an account? <a href={% url 'login' %}>Login</a></p>
+
+    <div>
+      <p>{{form.errors}}</p>
+    </div>
+    
+  </form>
+{% endblock  %}
