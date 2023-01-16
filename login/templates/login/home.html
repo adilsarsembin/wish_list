@@ -7,11 +7,4 @@
 {% endblock  %}
 
 {% block content %}
-  <p>Hello, {{request.user.first_name}} {{request.user.last_name}}</p>
-  <a href={% url 'logout' %}>Logout</a>
-  <form method='POST' action=''>
-    {% csrf_token %}
-    <input type='text' name='film_name' placeholder="Enter the name of film">
-    <input type="submit" value="Search">
-  </form>
 {% endblock  %}

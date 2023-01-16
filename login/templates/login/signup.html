@@ -7,40 +7,82 @@
 {% endblock  %}
 
 {% block content %}
-  <h3>Registration</h3>
-  <form method='POST' action=''>
-    {% csrf_token %}
-    <div>
-      {{form.first_name.label}}: 
-      {{form.first_name}}
-    </div>
+<section class="vh-100">
+  <div class="container py-5 h-100">
+    <div class="row d-flex align-items-center justify-content-center h-100">
+      <div class="col-md-8 col-lg-7 col-xl-6">
+        <img
+          src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg"
+          class="img-fluid"
+          alt="Phone image"
+        />
+      </div>
+      <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
+        <form method="POST" action="">
+          {% csrf_token %}
+          <!-- First name input -->
+          <div class="form-outline mb-4">
+            <label class="form-label" for="form1Example1"> First name </label>
+            <input
+              type="text"
+              id="form1Example1"
+              class="form-control form-control-lg"
+              name="first_name"
+            />
+          </div>
 
-    <div>
-      {{form.last_name.label}}: 
-      {{form.last_name}}
-    </div>
+          <!-- Last name input -->
+          <div class="form-outline mb-4">
+            <label class="form-label" for="form1Example2"> Last name </label>
+            <input
+              type="text"
+              id="form1Example2"
+              class="form-control form-control-lg"
+              name="last_name"
+            />
+          </div>
 
-    <div>
-      {{form.username.label}}: 
-      {{form.username}}
-    </div>
+          <!-- Username input -->
+          <div class="form-outline mb-4">
+            <label class="form-label" for="form1Example3"> Username </label>
+            <input
+              type="text"
+              id="form1Example3"
+              class="form-control form-control-lg"
+              name="username"
+            />
+          </div>
 
-    <div>
-      {{form.password1.label}}: 
-      {{form.password1}}
-    </div>
+          <!-- Password input -->
+          <div class="form-outline mb-4">
+            <label class="form-label" for="form1Example4"> Password </label>
+            <input
+              type="password"
+              id="form1Example4"
+              class="form-control form-control-lg"
+              name="password1"
+            />
+          </div>
 
-    <div>
-      {{form.password2.label}}: 
-      {{form.password2}}
-    </div>
-    
-    <input type='submit' value="Sign up">
-    <p>Already have an account? <a href={% url 'login' %}>Login</a></p>
+          <!-- Password verification -->
+          <div class="form-outline mb-4">
+            <label class="form-label" for="form1Example5"> Repeat password </label>
+            <input
+              type="password"
+              id="form1Example5"
+              class="form-control form-control-lg"
+              name="password2"/>
+          </div>
 
-    <div>
-      <p>{{form.errors}}</p>
+          <!-- Submit button -->
+          <button type="submit" class="btn btn-primary btn-lg btn-block">
+            Sign up
+          </button>
+        </form>
+
+        <p>Already registered? <a href={% url 'login' %}>Login</a></p>
+      </div>
     </div>
-    
-  </form>
+  </div>
+</section>
 {% endblock  %}

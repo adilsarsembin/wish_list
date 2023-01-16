@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
+from django.contrib import messages
 
 import requests
 import environ
@@ -14,6 +15,7 @@ from .models import Movie
 env = environ.Env()
 environ.Env.read_env()
 
+
 def user_login(request):
 
     if request.user.is_authenticated:
@@ -24,9 +26,12 @@ def user_login(request):
         password = request.POST.get('password')
 
         user = authenticate(request, username=username, password=password)
-        if user is not None:
+        if user is not None: 
             login(request, user)
-            return redirect('home')
+            messages.success(request, 'User was authenticated successfully!')
+            return redirect('home')  
+        else:
+            messages.error(request, 'Your username or password must be incorrect! Try again!')
 
     return render(request, 'login/login.html')
 
@@ -41,7 +46,10 @@ def signup(request):
         form = CreateUserForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, 'User was created successfully! Redirecting you to a login page!')
             return redirect('login')
+        else:
+            messages.error(request, form.errors)
 
     context = {'form': form}
     return render(request, 'login/signup.html', context)
@@ -59,9 +67,8 @@ def home(request):
 
         return redirect('search', name=film)
 
-    
-
     return render(request, 'login/home.html')
+
 
 @login_required(login_url='login')
 def search(request, name):
@@ -74,20 +81,23 @@ def search(request, name):
         auth_user = get_user_model()
         cur_user = auth_user.objects.get(username=request.user.username)
 
-        my_movie = Movie(title=title, release_date=release_date, rating=float(rating))
-        my_movie.save()
-        my_movie.user.add(cur_user)
-        my_movie.save()
+        if not Movie.objects.filter(title=title, release_date=release_date):
+            my_movie = Movie(
+                title=title, release_date=release_date, rating=float(rating))
+            my_movie.save()
+            my_movie.user.add(cur_user)
+            my_movie.save()
+        else:
+            my_movie = Movie.objects.get(
+                title=title, release_date=release_date)
+            my_movie.user.add(cur_user)
 
-        print(my_movie.user.all())
-        
-    
-    
     film_url = '+'.join(name.split(' '))
     results = get_data(film_url)
 
     context = {"name": name, "results": results}
     return render(request, 'login/search.html', context)
+
 
 def get_data(film_url):
     api_key = env('API_KEY')
