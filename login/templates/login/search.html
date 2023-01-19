@@ -8,22 +8,22 @@
 
 {% block content %}
   <h2> That's what I could find for "{{ name }}": </h2>
-  <ul>
     {% for result in results %}
-    <li>
       <div>
-        <form method="POST" action="">
+        <form method="POST" action={% url 'movie_add' %}>
           {% csrf_token %}
-          <p>Title: {{ result.title }}</p>
-          <input type="hidden" name="title" value="{{ result.title }}" />
-          <p>Release date: {{ result.release_date }}</p>
-          <input type="hidden" name="date" value="{{ result.release_date }}" />
-          <p>TMDB Rating: {{ result.vote_average }}</p>
-          <input type="hidden" name="rating" value="{{ result.vote_average }}" />
-          <button type="submit">Add to wish list</button>
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Title: {{ result.title }}</h5>
+              <input type="hidden" name="title" value="{{ result.title }}" />
+              <p class="card-text">Release date: {{ result.release_date }}</p>
+              <input type="hidden" name="date" value="{{ result.release_date }}" />
+              <p class="card-text">TMDB Rating: {{ result.vote_average }}</p>
+              <input type="hidden" name="rating" value="{{ result.vote_average }}" />
+              <button type="submit" class="btn btn-primary">Add to wish list</button>
+            </div>
+          </div>
         </form>
       </div>
-    </li> 
     {% endfor %} 
-  </ul>
 {% endblock  %}

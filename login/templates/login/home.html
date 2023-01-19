@@ -7,4 +7,20 @@
 {% endblock  %}
 
 {% block content %}
+  {% for movie in movie_list %}
+    <div class="card">
+      <div class="card-body">
+        <form method="POST" action={% url 'movie_delete' movie.id %}>
+        {% csrf_token %}
+        <h5 class="card-title">{{ movie.title }}</h5>
+        <input type="hidden" name="title" value="{{ movie.title }}" />
+        <p class="card-text"> Release date: {{ movie.release_date }} </p>
+        <input type="hidden" name="date" value="{{ movie.release_date }}" />
+        <p class="card-text">TMDB Rating: {{ movie.rating }}</p>
+        <input type="hidden" name="rating" value="{{ movie.rating }}" />
+        <button type="submit" class="btn btn-outline-danger btn-rounded">Delete</button>
+        </form>
+      </div>
+    </div>
+  {% endfor %}
 {% endblock  %}

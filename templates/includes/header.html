@@ -21,7 +21,7 @@
           <a class="nav-link active" href={% url 'logout' %}>Logout</a>
         </li>
       </ul>
-      <form class="d-flex input-group w-auto" method="POST" action="/search/">
+      <form class="d-flex input-group w-auto" method="POST" action="">
         {% csrf_token %}
         <input
           type="search"

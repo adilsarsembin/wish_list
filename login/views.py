@@ -26,12 +26,13 @@ def user_login(request):
         password = request.POST.get('password')
 
         user = authenticate(request, username=username, password=password)
-        if user is not None: 
+        if user is not None:
             login(request, user)
             messages.success(request, 'User was authenticated successfully!')
-            return redirect('home')  
+            return redirect('home')
         else:
-            messages.error(request, 'Your username or password must be incorrect! Try again!')
+            messages.error(
+                request, 'Your username or password must be incorrect! Try again!')
 
     return render(request, 'login/login.html')
 
@@ -46,7 +47,8 @@ def signup(request):
         form = CreateUserForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'User was created successfully! Redirecting you to a login page!')
+            messages.success(
+                request, 'User was created successfully! Redirecting you to a login page!')
             return redirect('login')
         else:
             messages.error(request, form.errors)
@@ -67,12 +69,51 @@ def home(request):
 
         return redirect('search', name=film)
 
-    return render(request, 'login/home.html')
+    auth_user = get_user_model()
+    cur_user = auth_user.objects.get(username=request.user.username)
+
+    movie_list = Movie.objects.filter(user=cur_user)
+    context = {"movie_list": movie_list}
+
+    return render(request, 'login/home.html', context)
 
 
 @login_required(login_url='login')
 def search(request, name):
+    if request.method == 'POST':
+        film = request.POST.get('film_name')
 
+        return redirect('search', name=film)
+
+    film_url = '+'.join(name.split(' '))
+    results = get_data(film_url)
+
+    context = {"name": name, "results": results}
+    return render(request, 'login/search.html', context)
+
+
+def get_data(film_url):
+    api_key = env('API_KEY')
+    url = f'https://api.themoviedb.org/3/search/movie?api_key={api_key}&query={film_url}'
+    results = requests.get(url).json()['results']
+    return results
+
+
+@login_required(login_url='login')
+def movie_delete(request, pk):
+    if request.method == "POST":
+        auth_user = get_user_model()
+        cur_user = auth_user.objects.get(username=request.user.username)
+
+        my_movie = Movie.objects.get(user=cur_user, id=pk)
+        my_movie.delete()
+        messages.success(request, 'Deleting has been done successfully!')
+
+    return redirect('home')
+
+
+@login_required(login_url='login')
+def movie_add(request):
     if request.method == 'POST':
         title = request.POST.get('title')
         rating = request.POST.get('rating')
@@ -91,16 +132,6 @@ def search(request, name):
             my_movie = Movie.objects.get(
                 title=title, release_date=release_date)
             my_movie.user.add(cur_user)
+        messages.success(request, 'Adding has been done successfully!')
 
-    film_url = '+'.join(name.split(' '))
-    results = get_data(film_url)
-
-    context = {"name": name, "results": results}
-    return render(request, 'login/search.html', context)
-
-
-def get_data(film_url):
-    api_key = env('API_KEY')
-    url = f'https://api.themoviedb.org/3/search/movie?api_key={api_key}&query={film_url}'
-    results = requests.get(url).json()['results']
-    return results
+    return redirect('home')
