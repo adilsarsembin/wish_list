@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.contrib import messages
+from django.core.paginator import Paginator
 
 import requests
 import environ
@@ -56,7 +57,7 @@ def signup(request):
     context = {'form': form}
     return render(request, 'login/signup.html', context)
 
-
+@login_required(login_url='login')
 def user_logout(request):
     logout(request)
     return redirect('login')
@@ -88,14 +89,27 @@ def search(request, name):
     film_url = '+'.join(name.split(' '))
     results = get_data(film_url)
 
-    context = {"name": name, "results": results}
+    paginator = Paginator(results, 20)
+    pag_len = paginator.num_pages
+    page = request.GET.get('page')
+    pag_obj = paginator.get_page(page)
+
+    context = {"name": name, "pag_obj": pag_obj, "pag_len": pag_len}
     return render(request, 'login/search.html', context)
 
 
 def get_data(film_url):
     api_key = env('API_KEY')
+    results = []
     url = f'https://api.themoviedb.org/3/search/movie?api_key={api_key}&query={film_url}'
-    results = requests.get(url).json()['results']
+    page_nums = requests.get(url).json()['total_pages']
+    if page_nums >= 5:
+        page_nums = 5
+    for i in range(1, page_nums+1):
+        new_url = f'https://api.themoviedb.org/3/search/movie?api_key={api_key}&query={film_url}&page={i}'
+        result = requests.get(new_url).json()['results']
+        for res in result:
+            results.append(res)
     return results
 
 

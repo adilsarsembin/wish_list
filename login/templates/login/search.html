@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 
+
 {% block title %}
   <title>
     Films
@@ -7,23 +8,65 @@
 {% endblock  %}
 
 {% block content %}
+  
+  
+  
   <h2> That's what I could find for "{{ name }}": </h2>
-    {% for result in results %}
-      <div>
-        <form method="POST" action={% url 'movie_add' %}>
-          {% csrf_token %}
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Title: {{ result.title }}</h5>
-              <input type="hidden" name="title" value="{{ result.title }}" />
-              <p class="card-text">Release date: {{ result.release_date }}</p>
-              <input type="hidden" name="date" value="{{ result.release_date }}" />
-              <p class="card-text">TMDB Rating: {{ result.vote_average }}</p>
-              <input type="hidden" name="rating" value="{{ result.vote_average }}" />
-              <button type="submit" class="btn btn-primary">Add to wish list</button>
+    {% if pag_obj %}
+      {% for obj in pag_obj %}
+        <div>
+          <form method="POST" action={% url 'movie_add' %}>
+            {% csrf_token %}
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Title: {{ obj.title }}</h5>
+                <input type="hidden" name="title" value="{{ obj.title }}" />
+                <p class="card-text">Release date: {{ obj.release_date }}</p>
+                <input type="hidden" name="date" value="{{ obj.release_date }}" />
+                <p class="card-text">TMDB Rating: {{ obj.vote_average }}</p>
+                <input type="hidden" name="rating" value="{{ obj.vote_average }}" />
+                <button type="submit" class="btn btn-primary">Add to wish list</button>
+              </div>
             </div>
-          </div>
-        </form>
-      </div>
-    {% endfor %} 
+          </form>
+        </div>
+      {% endfor %} 
+    
+      <nav aria-label="Search result pages">
+        <ul class="pagination">
+          {% if pag_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ pag_obj.previous_page_number }}">&laquo;</a>
+            </li>
+            <li class="page-item"><a class="page-link" href="?page={{ pag_obj.previous_page_number }}">{{ pag_obj.previous_page_number }}</a></li>
+          {% else %}
+            <li class="page-item disabled">
+              <a class="page-link" href="#">&laquo;</a>
+            </li>
+          {% endif %}
+          
+          <li class="page-item active" aria-current="page">
+            <a class="page-link" href="?page={{ pag_obj.number }}">{{ pag_obj.number }}<span class="visually-hidden"></span></a>
+          </li>
+
+          {% if pag_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ pag_obj.next_page_number }}">{{ pag_obj.next_page_number }}</a></li>
+            <li class="page-item disabled">
+              <a class="page-link" href="#">...</a>
+            </li> 
+            <li class="page-item">
+              <a class="page-link" href="?page={{ pag_len }}">{{ pag_len }}</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ pag_obj.next_page_number }}">&raquo;</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <a class="page-link" href="#">&raquo;</a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    {% endif %}
+  
 {% endblock  %}
