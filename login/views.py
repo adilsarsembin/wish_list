@@ -69,7 +69,7 @@ def home(request):
     if request.method == 'POST':
         film = request.POST.get('film_name')
 
-        return redirect(reverse('search', args=(film,)))
+        return redirect('search', name=film)
 
     auth_user = get_user_model()
     cur_user = auth_user.objects.get(username=request.user.username)
@@ -85,7 +85,7 @@ def search(request, name):
     if request.method == 'POST':
         film = request.POST.get('film_name')
 
-        return redirect(reverse('search', args=(film)))
+        return redirect('search', name=film)
 
     film_url = '+'.join(name.split(' '))
     results = get_data(film_url)
