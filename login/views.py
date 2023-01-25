@@ -73,7 +73,7 @@ def home(request):
     auth_user = get_user_model()
     cur_user = auth_user.objects.get(username=request.user.username)
 
-    movie_list = Movie.objects.filter(user=cur_user)
+    movie_list = Movie.objects.filter(user=cur_user, is_watched=False)
     context = {"movie_list": movie_list}
 
     return render(request, 'login/home.html', context)
@@ -115,13 +115,22 @@ def get_data(film_url):
 
 @login_required(login_url='login')
 def movie_delete(request, pk):
-    if request.method == "POST":
-        auth_user = get_user_model()
-        cur_user = auth_user.objects.get(username=request.user.username)
+    auth_user = get_user_model()
+    cur_user = auth_user.objects.get(username=request.user.username)
+
+    if request.method == "POST" and 'delete' in request.POST:
 
         my_movie = Movie.objects.get(user=cur_user, id=pk)
         my_movie.delete()
         messages.success(request, 'Deleting has been done successfully!')
+    
+    if request.method == "POST" and 'update' in request.POST:
+        my_movie = Movie.objects.get(user=cur_user, id=pk)
+        my_movie.is_watched = True
+        my_movie.save()
+
+        messages.success(request, 'Film was added to watched successfully!')
+
 
     return redirect('home')
 
@@ -149,3 +158,10 @@ def movie_add(request):
         messages.success(request, 'Adding has been done successfully!')
 
     return redirect('home')
+
+@login_required(login_url='login')
+def watched_movies(request):
+    my_movies = Movie.objects.filter(is_watched=True)
+    context = {'my_movies': my_movies}
+
+    return render(request, 'login/watched_movies.html', context=context)

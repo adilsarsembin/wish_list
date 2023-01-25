@@ -12,6 +12,7 @@
   
   
   <h2> That's what I could find for "{{ name }}": </h2>
+  
     {% if pag_obj %}
       {% for obj in pag_obj %}
         <div>
@@ -38,7 +39,6 @@
             <li class="page-item">
               <a class="page-link" href="?page={{ pag_obj.previous_page_number }}">&laquo;</a>
             </li>
-            <li class="page-item"><a class="page-link" href="?page={{ pag_obj.previous_page_number }}">{{ pag_obj.previous_page_number }}</a></li>
           {% else %}
             <li class="page-item disabled">
               <a class="page-link" href="#">&laquo;</a>
@@ -50,10 +50,11 @@
           </li>
 
           {% if pag_obj.has_next %}
-            <li class="page-item"><a class="page-link" href="?page={{ pag_obj.next_page_number }}">{{ pag_obj.next_page_number }}</a></li>
-            <li class="page-item disabled">
-              <a class="page-link" href="#">...</a>
-            </li> 
+            {% if pag_obj.next_page_number < pag_len %}
+              <li class="page-item disabled">
+                <a class="page-link" href="#">...</a>
+              </li>
+            {% endif %}
             <li class="page-item">
               <a class="page-link" href="?page={{ pag_len }}">{{ pag_len }}</a>
             </li>

@@ -18,7 +18,8 @@
         <input type="hidden" name="date" value="{{ movie.release_date }}" />
         <p class="card-text">TMDB Rating: {{ movie.rating }}</p>
         <input type="hidden" name="rating" value="{{ movie.rating }}" />
-        <button type="submit" class="btn btn-outline-danger btn-rounded">Delete</button>
+        <button type="submit" class="btn btn-outline-danger btn-rounded" name="delete">Delete</button>
+        <button type="submit" class="btn btn-outline-primary btn-rounded" name="update">Watched</button>
         </form>
       </div>
     </div>
