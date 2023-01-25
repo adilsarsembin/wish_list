@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.shortcuts import render, redirect
+from django.urls import reverse
 
 import requests
 import environ
@@ -20,7 +21,7 @@ environ.Env.read_env()
 def user_login(request):
 
     if request.user.is_authenticated:
-        return redirect('home')
+        return redirect(reverse('home'))
 
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -30,7 +31,7 @@ def user_login(request):
         if user is not None:
             login(request, user)
             messages.success(request, 'User was authenticated successfully!')
-            return redirect('home')
+            return redirect(reverse('home'))
         else:
             messages.error(
                 request, 'Your username or password must be incorrect! Try again!')
@@ -50,7 +51,7 @@ def signup(request):
             form.save()
             messages.success(
                 request, 'User was created successfully! Redirecting you to a login page!')
-            return redirect('login')
+            return redirect(reverse('login'))
         else:
             messages.error(request, form.errors)
 
@@ -60,7 +61,7 @@ def signup(request):
 @login_required(login_url='login')
 def user_logout(request):
     logout(request)
-    return redirect('login')
+    return redirect(reverse('login'))
 
 
 @login_required(login_url='login')
@@ -68,7 +69,7 @@ def home(request):
     if request.method == 'POST':
         film = request.POST.get('film_name')
 
-        return redirect('search', name=film)
+        return redirect(reverse('search', args=(film,)))
 
     auth_user = get_user_model()
     cur_user = auth_user.objects.get(username=request.user.username)
@@ -84,12 +85,12 @@ def search(request, name):
     if request.method == 'POST':
         film = request.POST.get('film_name')
 
-        return redirect('search', name=film)
+        return redirect(reverse('search', args=(film)))
 
     film_url = '+'.join(name.split(' '))
     results = get_data(film_url)
 
-    paginator = Paginator(results, 20)
+    paginator = Paginator(results, 10)
     pag_len = paginator.num_pages
     page = request.GET.get('page')
     pag_obj = paginator.get_page(page)
@@ -114,7 +115,7 @@ def get_data(film_url):
 
 
 @login_required(login_url='login')
-def movie_delete(request, pk):
+def movie(request, pk):
     auth_user = get_user_model()
     cur_user = auth_user.objects.get(username=request.user.username)
 
@@ -131,13 +132,7 @@ def movie_delete(request, pk):
 
         messages.success(request, 'Film was added to watched successfully!')
 
-
-    return redirect('home')
-
-
-@login_required(login_url='login')
-def movie_add(request):
-    if request.method == 'POST':
+    if request.method == 'POST' and 'add' in request.POST:
         title = request.POST.get('title')
         rating = request.POST.get('rating')
         release_date = request.POST.get('date')
@@ -145,22 +140,30 @@ def movie_add(request):
         auth_user = get_user_model()
         cur_user = auth_user.objects.get(username=request.user.username)
 
-        if not Movie.objects.filter(title=title, release_date=release_date):
+        if not Movie.objects.filter(user=cur_user, title=title, release_date=release_date):
             my_movie = Movie(
                 title=title, release_date=release_date, rating=float(rating))
             my_movie.save()
             my_movie.user.add(cur_user)
             my_movie.save()
+            messages.success(request, 'Adding has been done successfully!')
         else:
             my_movie = Movie.objects.get(
                 title=title, release_date=release_date)
             my_movie.user.add(cur_user)
-        messages.success(request, 'Adding has been done successfully!')
+            messages.info(request, 'Film is already in wish list or watched ones!')
+        
 
-    return redirect('home')
+
+    return redirect(reverse('home'))
+
 
 @login_required(login_url='login')
 def watched_movies(request):
+    if request.method == 'POST':
+        film = request.POST.get('film_name')
+
+        return redirect('search', name=film)
     my_movies = Movie.objects.filter(is_watched=True)
     context = {'my_movies': my_movies}
 

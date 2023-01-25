@@ -9,7 +9,6 @@
 {% block content %}
   {% for movie in my_movies %}
     <div class="card">
-      <h5 class="card-header">Film {{ movie.id }}</h5>
       <div class="card-body">
         <h5 class="card-title">{{ movie.title }}</h5>
         <p class="card-text">Release date: {{ movie.release_date }}</p>

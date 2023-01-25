@@ -9,7 +9,6 @@ urlpatterns = [
     path('logout/', views.user_logout, name='logout'),
     path('home/', views.home, name='home'),
     path('search/<str:name>', cache_page(120)(views.search), name='search'),
-    path('movie/<str:pk>', views.movie_delete, name='movie_delete'),
-    path('movie_add/', views.movie_add, name='movie_add'),
-    path('watched_movies/', views.watched_movies, name='watched_movies')
+    path('movie/<str:pk>', views.movie, name='movie'),
+    path('watched_movies/', views.watched_movies, name='watched_movies'),
 ]
