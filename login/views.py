@@ -1,6 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
@@ -103,9 +102,11 @@ def get_data(film_url):
     api_key = env('API_KEY')
     results = []
     url = f'https://api.themoviedb.org/3/search/movie?api_key={api_key}&query={film_url}'
+
     page_nums = requests.get(url).json()['total_pages']
     if page_nums >= 5:
         page_nums = 5
+    
     for i in range(1, page_nums+1):
         new_url = f'https://api.themoviedb.org/3/search/movie?api_key={api_key}&query={film_url}&page={i}'
         result = requests.get(new_url).json()['results']
@@ -124,7 +125,7 @@ def movie(request, pk):
         my_movie = Movie.objects.get(user=cur_user, id=pk)
         my_movie.delete()
         messages.success(request, 'Deleting has been done successfully!')
-    
+
     if request.method == "POST" and 'update' in request.POST:
         my_movie = Movie.objects.get(user=cur_user, id=pk)
         my_movie.is_watched = True
